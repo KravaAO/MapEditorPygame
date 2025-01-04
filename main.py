@@ -3,6 +3,7 @@ from buttons import ImageButton, Button
 from mapa import window, WIDTH, BLOCK_SIZE, HEIGHT, draw_grid
 import json
 import os
+
 init()
 
 clock = time.Clock()
@@ -52,34 +53,44 @@ class Block:
 def snap_to_grid(x, y):
     return (x // BLOCK_SIZE) * BLOCK_SIZE, (y // BLOCK_SIZE) * BLOCK_SIZE
 
-SPEED = 7
+
+SPEED = BLOCK_SIZE
+
+
 def update():
+    global cam_offsetx, cam_offsety
     keys = key.get_pressed()
     if keys[K_d]:
         for block in blocks:
             block.rect.x -= BLOCK_SIZE
+        cam_offsetx += BLOCK_SIZE
     if keys[K_a]:
         for block in blocks:
             block.rect.x += BLOCK_SIZE
+        cam_offsetx -= BLOCK_SIZE
     if keys[K_w]:
         for block in blocks:
             block.rect.y += BLOCK_SIZE
+        cam_offsety -= BLOCK_SIZE
     if keys[K_s]:
         for block in blocks:
             block.rect.y -= BLOCK_SIZE
+        cam_offsety += BLOCK_SIZE
 
+
+cam_offsetx = 0
+cam_offsety = 0
 
 is_show_grid = False
 is_shap_grid = True
 is_draw_mode = False
 # кнопки налаштувань
-btn_show_grid = Button(WIDTH - 200, 20, 150, 40, 'show grid', color_rect=(255, 0 , 0))
+btn_show_grid = Button(WIDTH - 200, 20, 150, 40, 'show grid', color_rect=(255, 0, 0))
 btn_snap_grid = Button(WIDTH - 200, btn_show_grid.rect.y + 50, 150, 40, 'snap grid', color_rect=(0, 175, 0))
 btn_draw_mode = Button(WIDTH - 200, btn_snap_grid.rect.y + 50, 150, 40, 'Draw mode', color_rect=(255, 0, 0))
 # кнопки збереження завантаження
 btn_save_world = Button(WIDTH - 200, HEIGHT - 80, 150, 40, 'Save to json')
-btn_load_world = Button(WIDTH- 200, btn_save_world.rect.y - 50, 150, 40, 'Load map')
-
+btn_load_world = Button(WIDTH - 200, btn_save_world.rect.y - 50, 150, 40, 'Load map')
 
 blocks = []
 block_type = None
@@ -109,7 +120,8 @@ while True:
                     if is_shap_grid:
                         x, y = snap_to_grid(e.pos[0] - BLOCK_SIZE // 2, e.pos[1] - BLOCK_SIZE // 2)
                     blocks.append(Block(block_type, x, y, BLOCK_SIZE, BLOCK_SIZE))
-                    block_state.append({"x": x, "y": y, "img": block_type})
+                    block_state.append({"x": x+cam_offsetx, "y": y+cam_offsety, "img": block_type})
+                    print(cam_offsetx, cam_offsety)
 
                     if e.button == 4:
                         scroll_y += scroll_speed
@@ -156,7 +168,7 @@ while True:
                         for i in range(len(map_list)):
                             x, y, img = map_list[i].values()
                             blocks.append(Block(img, x, y, BLOCK_SIZE, BLOCK_SIZE))
-                            block_state.append({"x": x, "y": y, "img": img})
+                            block_state.append({"x": x + cam_offsetx, "y": y + cam_offsety, "img": img})
                 except Exception as e:
                     print(f'Помилка завантаження {e}')
 
@@ -189,5 +201,3 @@ while True:
     clock.tick(60)
 
     update()
-
-
