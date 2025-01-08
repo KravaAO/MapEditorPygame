@@ -180,7 +180,7 @@ while True:
                         if is_shap_grid:
                             x, y = snap_to_grid(e.pos[0] - BLOCK_SIZE // 2, e.pos[1] - BLOCK_SIZE // 2)
                         blocks.append(Block(block_type, x, y, BLOCK_SIZE, BLOCK_SIZE))
-                        block_state.append({"x": x, "y": y, "img": block_type})
+                        block_state.append({"x": x+cam_offsetx, "y": y+cam_offsety, "img": block_type})
 
     window.fill((0, 0, 0))
     for block in blocks:
